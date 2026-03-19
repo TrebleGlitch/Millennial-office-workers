@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -39,6 +40,12 @@ public class HandController : MonoBehaviour
     {
         HandleMouseTracking();
         HandleInteraction();
+        HandleWorkPlace();
+    }
+    // 算法 框架
+    private void HandleWorkPlace()
+    {
+        
     }
 
     void HandleMouseTracking()
@@ -53,7 +60,7 @@ public class HandController : MonoBehaviour
             //leftHand.LookAt(hit.point);
             //rightHand.LookAt(hit.point);
 
-            // 2. �����߼����
+            // Interactable
             InteractableItem item = hit.collider.GetComponent<InteractableItem>();
             if (item != currentHoveredItem)
             {
@@ -61,6 +68,9 @@ public class HandController : MonoBehaviour
                 currentHoveredItem = item;
                 if (currentHoveredItem != null) currentHoveredItem.SetHighlight(true);
             }
+
+            // WorkPlace
+            
         }
         else
         {
@@ -70,6 +80,8 @@ public class HandController : MonoBehaviour
                 currentHoveredItem = null;
             }
         }
+
+        
     }
 
     void HandleInteraction()
@@ -92,12 +104,12 @@ public class HandController : MonoBehaviour
 
         if (Physics.Raycast(ray, out RaycastHit hit))
         {
-            // �������Ϊ�գ�����׼����Ʒ��ִ��ץȡ
+            // 手是空的
             if (heldItem == null && currentHoveredItem != null)
             {
                 StartCoroutine(GrabRoutine(hand, currentHoveredItem, baseLocalPos, isLeft: hand == leftHand));
             }
-            // �����������Ʒ������׼���Ǹ���Ʒ��"��λ"���������ñ�ǩ����ײ���жϣ������þ������ʾ��
+            // 手上有东西
             else if (heldItem != null)
             {
                 float distToSlot = Vector3.Distance(hit.point, heldItem.originalPosition);
