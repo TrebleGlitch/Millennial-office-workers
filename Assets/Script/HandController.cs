@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class HandController : MonoBehaviour
@@ -10,9 +11,21 @@ public class HandController : MonoBehaviour
     private InteractableItem leftHeldItem = null;
     private InteractableItem rightHeldItem = null;
 
+    [Header("Held Item Visual (Clone + Pool)")]
+    public Vector3 heldLocalPositionOffset = new Vector3(0f, 0f, 0.5f);
+    public Vector3 heldLocalEulerOffset = Vector3.zero;
+    public Vector3 heldLocalScale = Vector3.one;
+
+    private GameObject leftHeldVisual = null;
+    private int leftHeldVisualKey = 0;
+    private GameObject rightHeldVisual = null;
+    private int rightHeldVisualKey = 0;
+
+    private readonly Dictionary<int, Stack<GameObject>> pooledVisuals = new Dictionary<int, Stack<GameObject>>();
+
     private InteractableItem currentHoveredItem = null;
 
-    // ¼ÇÂ¼Ë«ÊÖµÄ³õÊ¼¾Ö²¿Î»ÖÃ£¬×¥Íê¶«Î÷ÒªÊÕ»ØÀ´
+    // ï¿½ï¿½Â¼Ë«ï¿½ÖµÄ³ï¿½Ê¼ï¿½Ö²ï¿½Î»ï¿½Ã£ï¿½×¥ï¿½ê¶«ï¿½ï¿½Òªï¿½Õ»ï¿½ï¿½ï¿½
     private Vector3 leftHandBasePos;
     private Vector3 rightHandBasePos;
 
@@ -33,13 +46,14 @@ public class HandController : MonoBehaviour
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
 
-        // 1. ÊÖ²¿¹âÇ¹Ãé×¼Âß¼­ (LookAt)
+        // 1. ï¿½Ö²ï¿½ï¿½ï¿½Ç¹ï¿½ï¿½×¼ï¿½ß¼ï¿½ (LookAt)
         if (Physics.Raycast(ray, out hit, 100f))
         {
-            leftHand.LookAt(hit.point);
-            rightHand.LookAt(hit.point);
+            //æ‰‹éƒ¨è·Ÿéšå…‰æ ‡
+            //leftHand.LookAt(hit.point);
+            //rightHand.LookAt(hit.point);
 
-            // 2. ¸ßÁÁÂß¼­¼ì²â
+            // 2. ï¿½ï¿½ï¿½ï¿½ï¿½ß¼ï¿½ï¿½ï¿½ï¿½
             InteractableItem item = hit.collider.GetComponent<InteractableItem>();
             if (item != currentHoveredItem)
             {
@@ -60,12 +74,12 @@ public class HandController : MonoBehaviour
 
     void HandleInteraction()
     {
-        // ×óÊÖ×¥È¡/·Å»Ø
+        // ï¿½ï¿½ï¿½ï¿½×¥È¡/ï¿½Å»ï¿½
         if (Input.GetMouseButtonDown(0))
         {
             ProcessHandAction(leftHand, ref leftHeldItem, leftHandBasePos);
         }
-        // ÓÒÊÖ×¥È¡/·Å»Ø
+        // ï¿½ï¿½ï¿½ï¿½×¥È¡/ï¿½Å»ï¿½
         else if (Input.GetMouseButtonDown(1))
         {
             ProcessHandAction(rightHand, ref rightHeldItem, rightHandBasePos);
@@ -78,32 +92,106 @@ public class HandController : MonoBehaviour
 
         if (Physics.Raycast(ray, out RaycastHit hit))
         {
-            // Èç¹ûÊÖÀïÎª¿Õ£¬ÇÒÃé×¼ÁËÎïÆ·£¬Ö´ĞĞ×¥È¡
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½Õ£ï¿½ï¿½ï¿½ï¿½ï¿½×¼ï¿½ï¿½ï¿½ï¿½Æ·ï¿½ï¿½Ö´ï¿½ï¿½×¥È¡
             if (heldItem == null && currentHoveredItem != null)
             {
                 StartCoroutine(GrabRoutine(hand, currentHoveredItem, baseLocalPos, isLeft: hand == leftHand));
             }
-            // Èç¹ûÊÖÀïÓĞÎïÆ·£¬ÇÒÃé×¼µÄÊÇ¸ÃÎïÆ·µÄ"¿ÕÎ»"£¨¿ÉÒÔÀûÓÃ±êÇ©»òÅö×²ÌåÅĞ¶Ï£¬ÕâÀïÓÃ¾àÀë¼ò»¯ÑİÊ¾£©
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×¼ï¿½ï¿½ï¿½Ç¸ï¿½ï¿½ï¿½Æ·ï¿½ï¿½"ï¿½ï¿½Î»"ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã±ï¿½Ç©ï¿½ï¿½ï¿½ï¿½×²ï¿½ï¿½ï¿½Ğ¶Ï£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½
             else if (heldItem != null)
             {
                 float distToSlot = Vector3.Distance(hit.point, heldItem.originalPosition);
-                if (distToSlot < 1.0f) // ÉäÏß´òµ½ÁËÔ­Î»¸½½ü
+                if (distToSlot < 1.0f) // ï¿½ï¿½ï¿½ß´ï¿½ï¿½ï¿½Ô­Î»ï¿½ï¿½ï¿½ï¿½
                 {
                     StartCoroutine(ReturnRoutine(hand, heldItem, baseLocalPos));
-                    // Çå¿ÕÊÖÀïÒıÓÃµÄÂß¼­ÔÚĞ­³ÌÖĞÍê³É
+                    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ãµï¿½ï¿½ß¼ï¿½ï¿½ï¿½Ğ­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                 }
             }
         }
     }
 
-    // ×¥È¡¶¯»­Ğ­³Ì£ºÊÖÉì¹ıÈ¥ -> ³ÉÎª¸¸½Úµã -> ÊÖËõ»ØÀ´
+    int GetPoolKey(InteractableItem source)
+    {
+        if (source == null) return 0;
+
+        // Prefer shared mesh as a stable "type" key across identical items.
+        MeshFilter mf = source.GetComponent<MeshFilter>();
+        if (mf != null && mf.sharedMesh != null) return mf.sharedMesh.GetInstanceID();
+
+        // Fallback: per-instance key (still works, just less pooling reuse).
+        return source.gameObject.GetInstanceID();
+    }
+
+    GameObject GetPooledClone(InteractableItem source, Transform hand, out int key)
+    {
+        key = GetPoolKey(source);
+
+        if (key != 0 && pooledVisuals.TryGetValue(key, out Stack<GameObject> stack) && stack.Count > 0)
+        {
+            GameObject reused = stack.Pop();
+            reused.transform.SetParent(hand, worldPositionStays: false);
+            reused.transform.localPosition = heldLocalPositionOffset;
+            reused.transform.localEulerAngles = heldLocalEulerOffset;
+            reused.transform.localScale = heldLocalScale;
+            reused.SetActive(true);
+            return reused;
+        }
+
+        GameObject clone = Instantiate(source.gameObject);
+        clone.name = $"{source.gameObject.name}_HeldVisual";
+        clone.transform.SetParent(hand, worldPositionStays: false);
+        clone.transform.localPosition = heldLocalPositionOffset;
+        clone.transform.localEulerAngles = heldLocalEulerOffset;
+        clone.transform.localScale = heldLocalScale;
+
+        // Make sure the visual clone doesn't interfere with raycasts / physics.
+        foreach (Collider c in clone.GetComponentsInChildren<Collider>(includeInactive: true))
+        {
+            c.enabled = false;
+        }
+        foreach (Rigidbody rb in clone.GetComponentsInChildren<Rigidbody>(includeInactive: true))
+        {
+            rb.isKinematic = true;
+            rb.detectCollisions = false;
+        }
+        foreach (InteractableItem ii in clone.GetComponentsInChildren<InteractableItem>(includeInactive: true))
+        {
+            ii.enabled = false;
+        }
+
+        return clone;
+    }
+
+    void ReturnToPool(int key, GameObject visual)
+    {
+        if (visual == null) return;
+
+        visual.SetActive(false);
+        visual.transform.SetParent(null);
+
+        if (key == 0)
+        {
+            Destroy(visual);
+            return;
+        }
+
+        if (!pooledVisuals.TryGetValue(key, out Stack<GameObject> stack))
+        {
+            stack = new Stack<GameObject>();
+            pooledVisuals[key] = stack;
+        }
+
+        stack.Push(visual);
+    }
+
+    // ×¥È¡ï¿½ï¿½ï¿½ï¿½Ğ­ï¿½Ì£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¥ -> ï¿½ï¿½Îªï¿½ï¿½ï¿½Úµï¿½ -> ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     IEnumerator GrabRoutine(Transform hand, InteractableItem itemToGrab, Vector3 basePos, bool isLeft)
     {
         if (isLeft) leftHeldItem = itemToGrab; else rightHeldItem = itemToGrab;
 
         Vector3 targetPos = itemToGrab.transform.position;
 
-        // Éì³ö
+        // ï¿½ï¿½ï¿½
         while (Vector3.Distance(hand.position, targetPos) > 0.1f)
         {
             hand.position = Vector3.MoveTowards(hand.position, targetPos, Time.deltaTime * handMoveSpeed);
@@ -111,11 +199,18 @@ public class HandController : MonoBehaviour
         }
 
         // ×¥×¡
-        itemToGrab.transform.SetParent(hand);
-        itemToGrab.transform.localPosition = Vector3.forward * 0.5f; // ¸ù¾İÄãµÄÇòÌå´óĞ¡Î¢µ÷Î»ÖÃ
-        itemToGrab.GetComponent<Rigidbody>().isKinematic = true; // ¼ÙÉèÄãÓĞ¸ÕÌå£¬×¥È¡Ê±¹Ø±ÕÎïÀí
+        if (isLeft)
+        {
+            if (leftHeldVisual != null) ReturnToPool(leftHeldVisualKey, leftHeldVisual);
+            leftHeldVisual = GetPooledClone(itemToGrab, hand, out leftHeldVisualKey);
+        }
+        else
+        {
+            if (rightHeldVisual != null) ReturnToPool(rightHeldVisualKey, rightHeldVisual);
+            rightHeldVisual = GetPooledClone(itemToGrab, hand, out rightHeldVisualKey);
+        }
 
-        // Ëõ»Ø
+        // ï¿½ï¿½ï¿½ï¿½
         while (Vector3.Distance(hand.localPosition, basePos) > 0.01f)
         {
             hand.localPosition = Vector3.MoveTowards(hand.localPosition, basePos, Time.deltaTime * handMoveSpeed);
@@ -123,27 +218,36 @@ public class HandController : MonoBehaviour
         }
     }
 
-    // ·Å»Ø¶¯»­Ğ­³Ì£ºÊÖÉì¹ıÈ¥ -> È¡Ïû¸¸½Úµã -> ÊÖËõ»ØÀ´
+    // ï¿½Å»Ø¶ï¿½ï¿½ï¿½Ğ­ï¿½Ì£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¥ -> È¡ï¿½ï¿½ï¿½ï¿½ï¿½Úµï¿½ -> ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     IEnumerator ReturnRoutine(Transform hand, InteractableItem itemToReturn, Vector3 basePos)
     {
         Vector3 targetPos = itemToReturn.originalPosition;
 
-        // Éì³ö
+        // ï¿½ï¿½ï¿½
         while (Vector3.Distance(hand.position, targetPos) > 0.1f)
         {
             hand.position = Vector3.MoveTowards(hand.position, targetPos, Time.deltaTime * handMoveSpeed);
             yield return null;
         }
 
-        // ·ÅÏÂ
-        itemToReturn.transform.SetParent(itemToReturn.originalParent);
-        itemToReturn.transform.position = itemToReturn.originalPosition;
-        itemToReturn.GetComponent<Rigidbody>().isKinematic = false;
+        // ï¿½ï¿½ï¿½ï¿½
+        if (hand == leftHand)
+        {
+            ReturnToPool(leftHeldVisualKey, leftHeldVisual);
+            leftHeldVisual = null;
+            leftHeldVisualKey = 0;
+        }
+        else
+        {
+            ReturnToPool(rightHeldVisualKey, rightHeldVisual);
+            rightHeldVisual = null;
+            rightHeldVisualKey = 0;
+        }
 
-        // Çå¿ÕÊÖÀïÒıÓÃ
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         if (hand == leftHand) leftHeldItem = null; else rightHeldItem = null;
 
-        // Ëõ»Ø
+        // ï¿½ï¿½ï¿½ï¿½
         while (Vector3.Distance(hand.localPosition, basePos) > 0.01f)
         {
             hand.localPosition = Vector3.MoveTowards(hand.localPosition, basePos, Time.deltaTime * handMoveSpeed);
