@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,6 +7,10 @@ public class HandController : MonoBehaviour
     public Transform leftHand;
     public Transform rightHand;
     public float handMoveSpeed = 5f;
+
+    [Header("Work Place Area")]
+    public Transform workPlaceAreaCenter;
+    public float placeToWorkPlaceDistance = 1.0f;
 
     private InteractableItem leftHeldItem = null;
     private InteractableItem rightHeldItem = null;
@@ -40,12 +43,6 @@ public class HandController : MonoBehaviour
     {
         HandleMouseTracking();
         HandleInteraction();
-        HandleWorkPlace();
-    }
-    // 算法 框架
-    private void HandleWorkPlace()
-    {
-        
     }
 
     void HandleMouseTracking()
@@ -112,13 +109,68 @@ public class HandController : MonoBehaviour
             // 手上有东西
             else if (heldItem != null)
             {
+                // 优先放到 WorkPlaceAreaCenter（同样用鼠标射线点击 + 距离判定）
+                if (workPlaceAreaCenter != null)
+                {
+                    float distToWorkPlace = Vector3.Distance(hit.point, workPlaceAreaCenter.position);
+                    if (distToWorkPlace < placeToWorkPlaceDistance)
+                    {
+                        StartCoroutine(PlaceToWorkPlaceRoutine(hand, baseLocalPos, isLeft: hand == leftHand));
+                        return;
+                    }
+                }
+
                 float distToSlot = Vector3.Distance(hit.point, heldItem.originalPosition);
-                if (distToSlot < 1.0f) // ���ߴ���ԭλ����
+                if (distToSlot < 1.0f)
                 {
                     StartCoroutine(ReturnRoutine(hand, heldItem, baseLocalPos));
-                    // ����������õ��߼���Э�������
                 }
             }
+        }
+    }
+
+    IEnumerator PlaceToWorkPlaceRoutine(Transform hand, Vector3 basePos, bool isLeft)
+    {
+        if (workPlaceAreaCenter == null) yield return null;
+
+        GameObject visual = isLeft ? leftHeldVisual : rightHeldVisual;
+        InteractableItem held = isLeft ? leftHeldItem : rightHeldItem;
+
+        if (visual == null || held == null) yield return null;
+
+        Vector3 targetPos = workPlaceAreaCenter.position;
+
+        // 手移动到工作区中心
+        while (Vector3.Distance(hand.position, targetPos) > 0.1f)
+        {
+            hand.position = Vector3.MoveTowards(hand.position, targetPos, Time.deltaTime * handMoveSpeed);
+            yield return null;
+        }
+
+        // 放置：把手持替身从手上解绑并移动到中心
+        visual.transform.SetParent(null);
+        visual.transform.position = workPlaceAreaCenter.position;
+        visual.transform.rotation = workPlaceAreaCenter.rotation;
+
+        // 清空手持状态
+        if (isLeft)
+        {
+            leftHeldVisual = null;
+            leftHeldVisualKey = 0;
+            leftHeldItem = null;
+        }
+        else
+        {
+            rightHeldVisual = null;
+            rightHeldVisualKey = 0;
+            rightHeldItem = null;
+        }
+
+        // 手回到原位
+        while (Vector3.Distance(hand.localPosition, basePos) > 0.01f)
+        {
+            hand.localPosition = Vector3.MoveTowards(hand.localPosition, basePos, Time.deltaTime * handMoveSpeed);
+            yield return null;
         }
     }
 
