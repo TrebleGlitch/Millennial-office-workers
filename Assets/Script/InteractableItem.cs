@@ -8,6 +8,8 @@ public class InteractableItem : MonoBehaviour
     [HideInInspector] public Vector3 originalPosition; // 记录初始位置，用于放回
     [HideInInspector] public Transform originalParent; // 记录初始父节点
 
+    public GameObject theGrabedObj;
+
     void Start()
     {
         meshRenderer = GetComponent<MeshRenderer>();

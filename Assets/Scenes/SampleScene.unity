@@ -825,6 +825,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   originalPosition: {x: 0, y: 0, z: 0}
   originalParent: {fileID: 0}
+  theGrabedObj: {fileID: 0}
 --- !u!54 &63083327
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1387,6 +1388,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   originalPosition: {x: 0, y: 0, z: 0}
   originalParent: {fileID: 0}
+  theGrabedObj: {fileID: 0}
 --- !u!54 &181705623
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -9609,6 +9611,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   originalPosition: {x: 0, y: 0, z: 0}
   originalParent: {fileID: 0}
+  theGrabedObj: {fileID: 0}
 --- !u!54 &733112129
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -14662,6 +14665,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   originalPosition: {x: 0, y: 0, z: 0}
   originalParent: {fileID: 0}
+  theGrabedObj: {fileID: 0}
 --- !u!54 &1130086320
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -19035,6 +19039,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   originalPosition: {x: 0, y: 0, z: 0}
   originalParent: {fileID: 0}
+  theGrabedObj: {fileID: 0}
 --- !u!54 &1651396679
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -21947,6 +21952,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   originalPosition: {x: 0, y: 0, z: 0}
   originalParent: {fileID: 0}
+  theGrabedObj: {fileID: 1570106696235698676, guid: 54d3b92dfe65e934f9e2d1166afe2fe9,
+    type: 3}
 --- !u!54 &1989881332
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -24592,6 +24599,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   originalPosition: {x: 0, y: 0, z: 0}
   originalParent: {fileID: 0}
+  theGrabedObj: {fileID: 0}
 --- !u!54 &2108069501
 Rigidbody:
   m_ObjectHideFlags: 0

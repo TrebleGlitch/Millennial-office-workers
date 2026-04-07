@@ -188,8 +188,10 @@ public class HandController : MonoBehaviour
 
     GameObject GetPooledClone(InteractableItem source, Transform hand, out int key)
     {
+        // 拿到的物品 
         key = GetPoolKey(source);
 
+        // 你池子里有了对应的物品 我就直接拿 不需要生成
         if (key != 0 && pooledVisuals.TryGetValue(key, out Stack<GameObject> stack) && stack.Count > 0)
         {
             GameObject reused = stack.Pop();
@@ -201,7 +203,14 @@ public class HandController : MonoBehaviour
             return reused;
         }
 
-        GameObject clone = Instantiate(source.gameObject);
+        // 如果池子没有 我再执行这里 来生产一个需要的物品
+        GameObject targetObj;
+        if (source.theGrabedObj == null)
+            targetObj = source.gameObject;
+        else
+            targetObj = source.theGrabedObj;
+
+        GameObject clone = Instantiate(targetObj);
         clone.name = $"{source.gameObject.name}_HeldVisual";
         clone.transform.SetParent(hand, worldPositionStays: false);
         clone.transform.localPosition = heldLocalPositionOffset;
@@ -255,7 +264,7 @@ public class HandController : MonoBehaviour
 
         Vector3 targetPos = itemToGrab.transform.position;
 
-        // ���
+        // 把手移动到目标点
         while (Vector3.Distance(hand.position, targetPos) > 0.1f)
         {
             hand.position = Vector3.MoveTowards(hand.position, targetPos, Time.deltaTime * handMoveSpeed);
