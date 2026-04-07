@@ -6416,13 +6416,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 996d862993d0d784887cc9977b409223, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manualTasks:
-  - taskName: TieRecipt
-    scoreReward: 50
+  taskPool:
+  - taskName: Test 1
+    scoreReward: 40
+    duration: 5
+  - taskName: T2
+    scoreReward: 67
+    duration: 5
+  - taskName: T3
+    scoreReward: 20
     duration: 3
-  - taskName: SayMorning
-    scoreReward: 10
-    duration: 10
+  minInterval: 2
+  maxInterval: 8
 --- !u!4 &402922896
 Transform:
   m_ObjectHideFlags: 0
