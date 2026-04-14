@@ -23,4 +23,16 @@ public class InteractableItem : MonoBehaviour
         // 简单的原型期高亮方案
         meshRenderer.material.color = isHighlighted ? Color.yellow : originalColor;
     }
+
+    [Header("任务记录")]
+    public string currentSequence = ""; // 记录操作顺序
+    public bool isTaskTarget = false;   // 标记这是否是需要提交的票据（比如发票）
+    public string toolActionName = "";  // 如果是工具（如印章），它产生的动作名（如 "Stamp;"）
+
+    // 新增一个方法：被处理时调用
+    public void ApplyAction(string actionName)
+    {
+        currentSequence += actionName;
+        Debug.Log($"{name} 现在的暗号是: {currentSequence}");
+    }
 }

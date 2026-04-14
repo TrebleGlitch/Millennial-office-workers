@@ -16,6 +16,8 @@ public class TaskConsoleController : MonoBehaviour
     private float nextInterval; // 存储当前这一轮随机出来的目标间隔
     private int taskCounter = 0;
 
+    TaskData currentActiveTask;
+
     void Start()
     {
         Debug.Log("<color=cyan>=== 动态随机任务调度中心已启动 ===</color>");
@@ -66,5 +68,12 @@ public class TaskConsoleController : MonoBehaviour
         taskCounter++;
 
         Debug.Log($"<color=yellow>[叮！新任务到达 - 编号 #{taskCounter}]</color> 目标: <b>{selectedTask.taskName}</b> | 限时: {selectedTask.duration}秒 | 奖励: {selectedTask.scoreReward}分");
+    }
+
+    // 在 TaskConsoleController.cs 中
+    public string GetCurrentTaskTargetSequence()
+    {
+        // 返回你当前随机生成的那个任务的 requiredSequence
+        return currentActiveTask.requiredSequence;
     }
 }
