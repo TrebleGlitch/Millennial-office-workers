@@ -304,17 +304,27 @@ public class HandController : MonoBehaviour
             yield return null;
         }
 
-        // ץס
-        if (isLeft)
+
+        // if is WORK PLACE S
+        if(itemToGrab.gameObject.tag == "WorkPlace")
         {
-            if (leftHeldVisual != null) ReturnToPool(leftHeldVisualKey, leftHeldVisual);
-            leftHeldVisual = GetPooledClone(itemToGrab, hand, out leftHeldVisualKey);
+            itemToGrab.transform.SetParent(hand);
         }
         else
         {
-            if (rightHeldVisual != null) ReturnToPool(rightHeldVisualKey, rightHeldVisual);
-            rightHeldVisual = GetPooledClone(itemToGrab, hand, out rightHeldVisualKey);
+            // ץס
+            if (isLeft)
+            {
+                if (leftHeldVisual != null) ReturnToPool(leftHeldVisualKey, leftHeldVisual);
+                leftHeldVisual = GetPooledClone(itemToGrab, hand, out leftHeldVisualKey);
+            }
+            else
+            {
+                if (rightHeldVisual != null) ReturnToPool(rightHeldVisualKey, rightHeldVisual);
+                rightHeldVisual = GetPooledClone(itemToGrab, hand, out rightHeldVisualKey);
+            }
         }
+        
 
         // send a task
         TaskConsoleController.Instance.GenerateRandomTask(); // 

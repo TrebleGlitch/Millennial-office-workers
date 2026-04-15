@@ -8867,7 +8867,7 @@ MonoBehaviour:
   originalParent: {fileID: 0}
   currentItemSequence: 
   targetTaskSequence: 
-  taskConsole: {fileID: 0}
+  taskConsole: {fileID: 402922895}
 --- !u!1 &707426934
 GameObject:
   m_ObjectHideFlags: 0
