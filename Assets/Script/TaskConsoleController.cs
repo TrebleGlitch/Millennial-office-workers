@@ -3,6 +3,14 @@ using UnityEngine;
 
 public class TaskConsoleController : MonoBehaviour
 {
+    private static TaskConsoleController _instance;
+
+    public static TaskConsoleController Instance
+    {
+        get { return _instance; }
+        private set { _instance = value; }
+    }
+
     [Header("任务池配置")]
     public List<TaskData> taskPool;
 
@@ -17,6 +25,11 @@ public class TaskConsoleController : MonoBehaviour
     private int taskCounter = 0;
 
     TaskData currentActiveTask;
+
+    private void Awake()
+    {
+        _instance = this;
+    }
 
     void Start()
     {
@@ -34,18 +47,18 @@ public class TaskConsoleController : MonoBehaviour
 
     void Update()
     {
-        if (taskPool == null || taskPool.Count == 0) return;
+        //if (taskPool == null || taskPool.Count == 0) return;
 
-        // 计时器递减
-        currentTimer -= Time.deltaTime;
+        //// 计时器递减
+        ////currentTimer -= Time.deltaTime;
 
-        // 到达随机目标时间
-        if (currentTimer <= 0f)
-        {
-            GenerateRandomTask();
-            // 关键改动：任务生成后，立即重新计算下一轮的随机间隔
-            SetNextRandomInterval();
-        }
+        //// 到达随机目标时间
+        //if (currentTimer <= 0f)
+        //{
+        //    GenerateRandomTask();
+        //    // 关键改动：任务生成后，立即重新计算下一轮的随机间隔
+        //    SetNextRandomInterval();
+        //}
     }
 
     /// <summary>
@@ -60,7 +73,7 @@ public class TaskConsoleController : MonoBehaviour
         Debug.Log($"<color=grey>[系统预报] 下一个任务将在 {nextInterval:F2} 秒后到达...</color>");
     }
 
-    void GenerateRandomTask()
+    public void GenerateRandomTask()
     {
         int randomIndex = Random.Range(0, taskPool.Count);
         TaskData selectedTask = taskPool[randomIndex];

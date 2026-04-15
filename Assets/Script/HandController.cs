@@ -10,6 +10,7 @@ public class HandController : MonoBehaviour
 
     [Header("Work Place Area")]
     public Transform workPlaceAreaCenter;
+    public WorkPlaceController workPlaceController;
     public float placeToWorkPlaceDistance = 1.0f;
 
     private InteractableItem leftHeldItem = null;
@@ -128,7 +129,13 @@ public class HandController : MonoBehaviour
             }
         }
     }
+    IEnumerator PlaceToRightTableSubmit()
+    {
+        // bin
+        // submit
 
+        yield return null;
+    }
     IEnumerator PlaceToWorkPlaceRoutine(Transform hand, Vector3 basePos, bool isLeft)
     {
         if (workPlaceAreaCenter == null) yield return null;
@@ -148,9 +155,35 @@ public class HandController : MonoBehaviour
         }
 
         // 放置：把手持替身从手上解绑并移动到中心
-        visual.transform.SetParent(null);
-        visual.transform.position = workPlaceAreaCenter.position;
-        visual.transform.rotation = workPlaceAreaCenter.rotation;
+        if (workPlaceAreaCenter.Find("pan(Clone)") == null && visual.GetComponent<InteractableItem>().toolActionName != "Pan")
+        {
+            // 无盘子 不能放
+            yield return null;
+        }
+        else
+        {
+            if (visual.GetComponent<InteractableItem>().toolActionName == "Pan")
+            {
+                if (workPlaceAreaCenter.Find("pan(Clone)") != null)
+                {
+                    // xiao hui pan on the hand
+                    yield return null;
+                }
+
+                visual.transform.position = workPlaceAreaCenter.position;
+                visual.transform.rotation = workPlaceAreaCenter.rotation;
+                visual.transform.SetParent(workPlaceAreaCenter);
+            }
+            else
+            {
+                visual.transform.SetParent(workPlaceAreaCenter.Find("pan(Clone)").transform);
+                visual.transform.position = workPlaceAreaCenter.position;
+                visual.transform.rotation = workPlaceAreaCenter.rotation;
+
+                // 记录 string
+                workPlaceController.ApplyItemPlaceAction(visual.GetComponent<InteractableItem>().toolActionName);
+            }    
+        }
 
         // 清空手持状态
         if (isLeft)
@@ -211,7 +244,7 @@ public class HandController : MonoBehaviour
             targetObj = source.theGrabedObj;
 
         GameObject clone = Instantiate(targetObj);
-        clone.name = $"{source.gameObject.name}_HeldVisual";
+        //clone.name = $"{source.gameObject.name}_HeldVisual";
         clone.transform.SetParent(hand, worldPositionStays: false);
         clone.transform.localPosition = heldLocalPositionOffset;
         clone.transform.localEulerAngles = heldLocalEulerOffset;
@@ -282,6 +315,9 @@ public class HandController : MonoBehaviour
             if (rightHeldVisual != null) ReturnToPool(rightHeldVisualKey, rightHeldVisual);
             rightHeldVisual = GetPooledClone(itemToGrab, hand, out rightHeldVisualKey);
         }
+
+        // send a task
+        TaskConsoleController.Instance.GenerateRandomTask(); // 
 
         // ����
         while (Vector3.Distance(hand.localPosition, basePos) > 0.01f)
