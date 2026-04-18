@@ -324,10 +324,6 @@ public class HandController : MonoBehaviour
                 rightHeldVisual = GetPooledClone(itemToGrab, hand, out rightHeldVisualKey);
             }
         }
-        
-
-        // send a task
-        TaskConsoleController.Instance.GenerateRandomTask(); // 
 
         // ����
         while (Vector3.Distance(hand.localPosition, basePos) > 0.01f)

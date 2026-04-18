@@ -10,6 +10,8 @@ public class WorkPlaceController : MonoBehaviour
     [HideInInspector] public Vector3 originalPosition; // 记录初始位置，用于放回
     [HideInInspector] public Transform originalParent; // 记录初始父节点
 
+    public GameEvent finishWorkPlaceEvent;
+
     void Start()
     {
         meshRenderer = GetComponent<MeshRenderer>();
@@ -24,6 +26,11 @@ public class WorkPlaceController : MonoBehaviour
         meshRenderer.material.color = isHighlighted ? Color.yellow : originalColor;
     }
 
+    private void Update()
+    {
+        if (TaskConsoleController.Instance.GetCurTaskData() != null)
+            targetTaskSequence = TaskConsoleController.Instance.GetCurrentTaskTargetSequence();
+    }
 
     public string currentItemSequence = ""; // 记录操作顺序
     public string targetTaskSequence = ""; // 目标任务的顺序
@@ -32,6 +39,16 @@ public class WorkPlaceController : MonoBehaviour
     public void ApplyItemPlaceAction(string actionName)
     {
         currentItemSequence += actionName +";";
+
+        // check if finish 
+        if (currentItemSequence == TaskConsoleController.Instance.GetCurrentTaskTargetSequence()) 
+        {
+            finishWorkPlaceEvent.Raise();
+        }
+
+
+        // check if wrong
+
         Debug.Log($"{name} 现在的暗号是: {currentItemSequence}");
     }
 

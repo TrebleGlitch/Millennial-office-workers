@@ -80,7 +80,14 @@ public class TaskConsoleController : MonoBehaviour
 
         taskCounter++;
 
+        currentActiveTask = selectedTask;
+
         Debug.Log($"<color=yellow>[叮！新任务到达 - 编号 #{taskCounter}]</color> 目标: <b>{selectedTask.taskName}</b> | 限时: {selectedTask.duration}秒 | 奖励: {selectedTask.scoreReward}分");
+    }
+
+    public TaskData GetCurTaskData()
+    {
+        return currentActiveTask;
     }
 
     // 在 TaskConsoleController.cs 中
