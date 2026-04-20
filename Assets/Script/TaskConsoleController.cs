@@ -23,6 +23,9 @@ public class TaskConsoleController : MonoBehaviour
     private float currentTimer;
     private float nextInterval; // 存储当前这一轮随机出来的目标间隔
     private int taskCounter = 0;
+    
+    [Header("玩家数据")]
+    public int totalScore = 0; // 记录玩家总分
 
     TaskData currentActiveTask;
 
@@ -91,9 +94,34 @@ public class TaskConsoleController : MonoBehaviour
     }
 
     // 在 TaskConsoleController.cs 中
+    /// <summary>
+    /// 供工作台获取当前任务的标准操作序列
+    /// </summary>
     public string GetCurrentTaskTargetSequence()
     {
+        if (currentActiveTask == null) return "";
         // 返回你当前随机生成的那个任务的 requiredSequence
         return currentActiveTask.requiredSequence;
+    }
+    /// <summary>
+    /// 任务完成，结算分数并清空当前任务状态
+    /// </summary>
+    public void CompleteCurrentTask()
+    {
+        if (currentActiveTask != null)
+        {
+            int reward = currentActiveTask.scoreReward;
+            totalScore += reward;
+
+            Debug.Log($"<color=green>?? <b>【任务圆满完成】</b> 获得工资: +{reward} | 总资金: {totalScore}</color>");
+
+            // 结算完成后清空“脑子”，等待下一轮生成
+            currentActiveTask = null;
+        }
+        else
+        {
+            Debug.Log("<color=orange>【额外提交】当前无活跃任务，仅获得基础加班费 +10</color>");
+            totalScore += 10;
+        }
     }
 }

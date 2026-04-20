@@ -13,6 +13,7 @@ public class HandController : MonoBehaviour
     public WorkPlaceController workPlaceController;
     public float placeToWorkPlaceDistance = 1.0f;
 
+    // 记录左右手当前拿着的真实物品
     private InteractableItem leftHeldItem = null;
     private InteractableItem rightHeldItem = null;
 
@@ -21,16 +22,19 @@ public class HandController : MonoBehaviour
     public Vector3 heldLocalEulerOffset = Vector3.zero;
     public Vector3 heldLocalScale = Vector3.one;
 
+    // 视觉替身（克隆体）的引用及对象池 Key
     private GameObject leftHeldVisual = null;
     private int leftHeldVisualKey = 0;
     private GameObject rightHeldVisual = null;
     private int rightHeldVisualKey = 0;
 
+    // 对象池，用于复用克隆体，节省性能
     private readonly Dictionary<int, Stack<GameObject>> pooledVisuals = new Dictionary<int, Stack<GameObject>>();
 
+    // 当前视线悬停的物品
     private InteractableItem currentHoveredItem = null;
 
-    // ��¼˫�ֵĳ�ʼ�ֲ�λ�ã�ץ�궫��Ҫ�ջ���
+    // 记录双手的初始局部位置，手伸出去交互完后需要收回这里
     private Vector3 leftHandBasePos;
     private Vector3 rightHandBasePos;
 
@@ -46,12 +50,15 @@ public class HandController : MonoBehaviour
         HandleInteraction();
     }
 
+    /// <summary>
+    /// 处理鼠标视线追踪：检测准心看着什么物品，并控制高亮
+    /// </summary>
     void HandleMouseTracking()
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
 
-        // 1. �ֲ���ǹ��׼�߼� (LookAt)
+        // 1.(LookAt)
         if (Physics.Raycast(ray, out hit, 100f))
         {
             //手部跟随光标
@@ -62,6 +69,7 @@ public class HandController : MonoBehaviour
             InteractableItem item = hit.collider.GetComponent<InteractableItem>();
             if (item != currentHoveredItem)
             {
+                // 视线移开了可交互物品，取消高亮
                 if (currentHoveredItem != null) currentHoveredItem.SetHighlight(false);
                 currentHoveredItem = item;
                 if (currentHoveredItem != null) currentHoveredItem.SetHighlight(true);
@@ -72,6 +80,7 @@ public class HandController : MonoBehaviour
         }
         else
         {
+            // 射线什么都没打到，取消高亮
             if (currentHoveredItem != null)
             {
                 currentHoveredItem.SetHighlight(false);
@@ -81,7 +90,10 @@ public class HandController : MonoBehaviour
 
         
     }
-
+    
+    /// <summary>
+    /// 处理按键交互：监听鼠标左/右键，触发相应手部的动作
+    /// </summary>
     void HandleInteraction()
     {
         // ����ץȡ/�Ż�
@@ -96,18 +108,21 @@ public class HandController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 核心大脑：处理手部动作判定（抓取、放工作台、递交、放回原位）
+    /// </summary>
     void ProcessHandAction(Transform hand, ref InteractableItem heldItem, Vector3 baseLocalPos)
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
         if (Physics.Raycast(ray, out RaycastHit hit))
         {
-            // 手是空的
+            // 状况1：手是空的，且视线正看着一个可交互物品 -> 执行抓取
             if (heldItem == null && currentHoveredItem != null)
             {
                 StartCoroutine(GrabRoutine(hand, currentHoveredItem, baseLocalPos, isLeft: hand == leftHand));
             }
-            // 手上有东西
+            // 状况2：手上有东西
             else if (heldItem != null)
             {
                 // 优先放到 WorkPlaceAreaCenter（同样用鼠标射线点击 + 距离判定）
@@ -117,10 +132,40 @@ public class HandController : MonoBehaviour
                     if (distToWorkPlace < placeToWorkPlaceDistance)
                     {
                         StartCoroutine(PlaceToWorkPlaceRoutine(hand, baseLocalPos, isLeft: hand == leftHand));
-                        return;
+                        return;// 放置后直接结束逻辑
                     }
                 }
+                    // 优先 2：判断是否要放到 提交区 (TaskSubmitZone)
+                TaskSubmitZone submitZone = hit.collider.GetComponent<TaskSubmitZone>();
+                if (submitZone != null)
+                {
+                    bool isLeft = (hand == leftHand); // 核心修复：判断当前是左手还是右手
+                    InteractableItem currentHeldItem = isLeft ? leftHeldItem : rightHeldItem;
 
+                    if (currentHeldItem != null)
+                    {
+                        // 1. 把真实物品交给提交区脚本去判断（里面会自动判定Tag并销毁加分）
+                        submitZone.ReceiveItemFromHand(currentHeldItem.gameObject);
+
+                        // 2. 彻底清空当前手部的状态，并安全回收（隐藏）对象池里的视觉克隆体
+                        if (isLeft)
+                        {
+                            leftHeldItem = null;
+                            ReturnToPool(leftHeldVisualKey, leftHeldVisual);
+                            leftHeldVisual = null;
+                            leftHeldVisualKey = 0;
+                        }
+                        else
+                        {
+                            rightHeldItem = null;
+                            ReturnToPool(rightHeldVisualKey, rightHeldVisual);
+                            rightHeldVisual = null;
+                            rightHeldVisualKey = 0;
+                        }
+                    }
+                    return; // 提交后直接结束逻辑
+                }
+                // 优先 3：判断是否要放回原位 (Slot)
                 float distToSlot = Vector3.Distance(hit.point, heldItem.originalPosition);
                 if (distToSlot < 1.0f)
                 {
@@ -128,6 +173,7 @@ public class HandController : MonoBehaviour
                 }
             }
         }
+
     }
     IEnumerator PlaceToRightTableSubmit()
     {
@@ -136,6 +182,7 @@ public class HandController : MonoBehaviour
 
         yield return null;
     }
+
     IEnumerator PlaceToWorkPlaceRoutine(Transform hand, Vector3 basePos, bool isLeft)
     {
         if (workPlaceAreaCenter == null) yield return null;
@@ -290,7 +337,9 @@ public class HandController : MonoBehaviour
         stack.Push(visual);
     }
 
-    // ץȡ����Э�̣������ȥ -> ��Ϊ���ڵ� -> ��������
+    /// <summary>
+    /// 抓取动作协程：手伸出 -> 生成克隆体在手中 -> 原物体关碰撞 -> 手收回
+    /// </summary>
     IEnumerator GrabRoutine(Transform hand, InteractableItem itemToGrab, Vector3 basePos, bool isLeft)
     {
         if (isLeft) leftHeldItem = itemToGrab; else rightHeldItem = itemToGrab;
@@ -325,7 +374,7 @@ public class HandController : MonoBehaviour
             }
         }
 
-        // ����
+        // 手部收回原位
         while (Vector3.Distance(hand.localPosition, basePos) > 0.01f)
         {
             hand.localPosition = Vector3.MoveTowards(hand.localPosition, basePos, Time.deltaTime * handMoveSpeed);
@@ -333,19 +382,21 @@ public class HandController : MonoBehaviour
         }
     }
 
-    // �Żض���Э�̣������ȥ -> ȡ�����ڵ� -> ��������
+    /// <summary>
+    /// 放回原位协程：手伸出 -> 回收克隆体 -> 恢复真实物品 -> 手收回
+    /// </summary>
     IEnumerator ReturnRoutine(Transform hand, InteractableItem itemToReturn, Vector3 basePos)
     {
         Vector3 targetPos = itemToReturn.originalPosition;
 
-        // ���
+        //手部伸向原位
         while (Vector3.Distance(hand.position, targetPos) > 0.1f)
         {
             hand.position = Vector3.MoveTowards(hand.position, targetPos, Time.deltaTime * handMoveSpeed);
             yield return null;
         }
 
-        // ����
+        //回收克隆体
         if (hand == leftHand)
         {
             ReturnToPool(leftHeldVisualKey, leftHeldVisual);
@@ -362,7 +413,7 @@ public class HandController : MonoBehaviour
         // �����������
         if (hand == leftHand) leftHeldItem = null; else rightHeldItem = null;
 
-        // ����
+        //手部收回原位
         while (Vector3.Distance(hand.localPosition, basePos) > 0.01f)
         {
             hand.localPosition = Vector3.MoveTowards(hand.localPosition, basePos, Time.deltaTime * handMoveSpeed);
