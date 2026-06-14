@@ -4,7 +4,7 @@ using Cinemachine;
 public class CameraController : MonoBehaviour
 {
     public CinemachineVirtualCamera[] cameras; // 0: Left, 1: Center, 2: Right
-    private int currentIndex = 1; // 初始在中间
+    private int currentIndex = 0; // 初始在中间
 
     void Update()
     {
