@@ -38,7 +38,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _ColorSteps: 32
+    - _ColorSteps: 64
     - _Float: 16
     - _Intensitive: 32
     m_Colors:
