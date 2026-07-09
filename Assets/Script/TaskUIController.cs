@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TaskUIController : MonoBehaviour
 {
@@ -9,7 +10,7 @@ public class TaskUIController : MonoBehaviour
 
     public GameObject ATaskPanel;
 
-    public float taskduration;
+    public float taskDuration;
 
     public TMP_Text taskTitle;
 
@@ -28,14 +29,11 @@ public class TaskUIController : MonoBehaviour
 
     public void AddAndShowTaskPanelUI(float duration, string title, string content)
     {
-        taskduration = duration;
-
-        //taskTitle.text = title;
-
-        //taskContent.text = content;
-
+        taskDuration = duration;
 
         var temp = Instantiate(ATaskPanel, TaskContainer.transform);
+
+        LayoutRebuilder.ForceRebuildLayoutImmediate(TaskContainer.GetComponent<RectTransform>());
 
         temp.transform.Find("TaskTitle").GetComponent<TMP_Text>().text = title;
         temp.transform.Find("TaskContent").GetComponent<TMP_Text>().text =  "> "+ content;

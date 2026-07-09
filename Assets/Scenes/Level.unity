@@ -320149,7 +320149,7 @@ MonoBehaviour:
   TaskContainer: {fileID: 511590824}
   ATaskPanel: {fileID: 961818170882234150, guid: dfd19113cb79ac744a9c8ad147bc4c61,
     type: 3}
-  taskduration: 0
+  taskDuration: 0
   taskTitle: {fileID: 0}
   taskContent: {fileID: 0}
 --- !u!1001 &1767876818
