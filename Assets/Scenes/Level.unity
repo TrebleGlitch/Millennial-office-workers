@@ -44541,8 +44541,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 13.9, y: -238.8}
-  m_SizeDelta: {x: 522, y: 8.2205}
+  m_AnchoredPosition: {x: 38.599953, y: -235.39845}
+  m_SizeDelta: {x: 525.9922, y: 8.2205}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &262465103
 MonoBehaviour:
@@ -171529,16 +171529,16 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 941785992}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1767639040}
+  m_Father: {fileID: 1513516314}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -114.488846, y: -259.5}
+  m_AnchoredPosition: {x: -75.56477, y: 44.395874}
   m_SizeDelta: {x: 66.0226, y: 46.1266}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &941785994
@@ -171561,7 +171561,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Sweat
+  m_text: Time
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a9fb72713462bd34a99acbf23a40dd74, type: 2}
   m_sharedMaterial: {fileID: -4406428672775297824, guid: a9fb72713462bd34a99acbf23a40dd74,
@@ -171571,8 +171571,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4286578688
-  m_fontColor: {r: 0, g: 0, b: 0.5019608, a: 1}
+    rgba: 4278190080
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -222210,7 +222210,7 @@ GameObject:
   - component: {fileID: 1244485409}
   - component: {fileID: 1244485408}
   m_Layer: 5
-  m_Name: TimeProcessing
+  m_Name: HandSweatProcessing
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -222228,12 +222228,12 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1513516314}
+  m_Father: {fileID: 1827230511}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 65, y: -238.06}
-  m_SizeDelta: {x: 42.8001, y: 522.88}
+  m_AnchoredPosition: {x: -149, y: -21.7}
+  m_SizeDelta: {x: 42.8001, y: 470}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1244485408
 MonoBehaviour:
@@ -258888,7 +258888,7 @@ GameObject:
   - component: {fileID: 1431465151}
   - component: {fileID: 1431465150}
   m_Layer: 5
-  m_Name: HandSweatProcessing
+  m_Name: TimeProcessing
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -258910,8 +258910,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -36.6, y: -238.5}
-  m_SizeDelta: {x: 42.8001, y: 522}
+  m_AnchoredPosition: {x: -11.9, y: -235.09616}
+  m_SizeDelta: {x: 42.8001, y: 525.9924}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1431465150
 MonoBehaviour:
@@ -272452,8 +272452,8 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 941785993}
   - {fileID: 1431465149}
-  - {fileID: 1244485407}
   - {fileID: 262465102}
   - {fileID: 1248939252}
   m_Father: {fileID: 1532432208}
@@ -320203,7 +320203,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 750535815}
-  - {fileID: 941785993}
   - {fileID: 1363107551}
   - {fileID: 511590825}
   m_Father: {fileID: 1532432208}
@@ -331036,7 +331035,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1244485407}
   m_Father: {fileID: 1532432208}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}

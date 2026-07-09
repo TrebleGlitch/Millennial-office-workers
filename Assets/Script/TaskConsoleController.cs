@@ -50,18 +50,18 @@ public class TaskConsoleController : MonoBehaviour
 
     void Update()
     {
-        //if (taskPool == null || taskPool.Count == 0) return;
+        if (taskPool == null || taskPool.Count == 0) return;
 
-        //// 计时器递减
-        ////currentTimer -= Time.deltaTime;
+        // 计时器递减
+        currentTimer -= Time.deltaTime;
 
-        //// 到达随机目标时间
-        //if (currentTimer <= 0f)
-        //{
-        //    GenerateRandomTask();
-        //    // 关键改动：任务生成后，立即重新计算下一轮的随机间隔
-        //    SetNextRandomInterval();
-        //}
+        // 到达随机目标时间
+        if (currentTimer <= 0f)
+        {
+            GenerateRandomTask();
+            // 关键改动：任务生成后，立即重新计算下一轮的随机间隔
+            SetNextRandomInterval();
+        }
     }
 
     /// <summary>
