@@ -29,6 +29,8 @@ public class TaskConsoleController : MonoBehaviour
 
     TaskData currentActiveTask;
 
+    public TaskUIController taskUIController;
+
     private void Awake()
     {
         _instance = this;
@@ -86,6 +88,9 @@ public class TaskConsoleController : MonoBehaviour
         currentActiveTask = selectedTask;
 
         Debug.Log($"<color=yellow>[叮！新任务到达 - 编号 #{taskCounter}]</color> 目标: <b>{selectedTask.taskName}</b> | 限时: {selectedTask.duration}秒 | 奖励: {selectedTask.scoreReward}分");
+
+        // Title , requiredSequence, selectedTask.duration
+        taskUIController.AddAndShowTaskPanelUI(selectedTask.duration,selectedTask.taskName,selectedTask.requiredSequence);
     }
 
     public TaskData GetCurTaskData()
