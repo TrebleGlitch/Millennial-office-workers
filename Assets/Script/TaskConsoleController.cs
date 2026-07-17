@@ -31,6 +31,8 @@ public class TaskConsoleController : MonoBehaviour
 
     public TaskUIController taskUIController;
 
+    public bool startTask;
+
     private void Awake()
     {
         _instance = this;
@@ -47,12 +49,12 @@ public class TaskConsoleController : MonoBehaviour
         }
 
         // 初始第一轮：随机一个间隔时间
-        SetNextRandomInterval();
+        //SetNextRandomInterval();
     }
 
     void Update()
     {
-        if (taskPool == null || taskPool.Count == 0) return;
+        if (taskPool == null || taskPool.Count == 0 || !startTask) return;
 
         // 计时器递减
         currentTimer -= Time.deltaTime;
