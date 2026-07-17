@@ -39,8 +39,10 @@ Material:
     m_Ints: []
     m_Floats:
     - _ColorSteps: 64
+    - _DepthThreshold: 0.04
     - _Float: 16
     - _Intensitive: 32
     m_Colors:
+    - _OutLineColor: {r: 0.081986435, g: 0.081986435, b: 0.18490559, a: 0}
     - _Resolution: {r: 320, g: 180, b: 0, a: 0}
   m_BuildTextureStacks: []
