@@ -10,12 +10,16 @@ public class InteractableItem : MonoBehaviour
 
     public GameObject theGrabedObj;
 
+    public AudioClip sfx;
+    private AudioSource sfxSource;
     void Start()
     {
         meshRenderer = GetComponent<MeshRenderer>();
         originalColor = meshRenderer.material.color;
         originalPosition = transform.position;
         originalParent = transform.parent;
+
+        sfxSource = this.gameObject.AddComponent<AudioSource>();
     }
 
     public void SetHighlight(bool isHighlighted)
@@ -27,4 +31,10 @@ public class InteractableItem : MonoBehaviour
     // workplace
     [Header("行动名称")]
     public string toolActionName = "";  // 如果是工具（如印章），它产生的动作名（如 "Stamp;"）
+
+    public void PlayGrabSound()
+    {
+        if(sfx != null && sfxSource != null)
+            sfxSource.PlayOneShot(sfx);
+    }
 }

@@ -63838,6 +63838,7 @@ MonoBehaviour:
   originalPosition: {x: 0, y: 0, z: 0}
   originalParent: {fileID: 0}
   theGrabedObj: {fileID: 0}
+  sfx: {fileID: 0}
   toolActionName: 
 --- !u!1 &364013323
 GameObject:
@@ -198469,6 +198470,10 @@ MonoBehaviour:
     scoreReward: 40
     duration: 5
     requiredSequence: Receipt;Glue;
+  - taskName: Test 1
+    scoreReward: 40
+    duration: 5
+    requiredSequence: Receipt;Glue;
   minInterval: 2
   maxInterval: 8
   totalScore: 0
@@ -309328,6 +309333,7 @@ MonoBehaviour:
   originalPosition: {x: 0, y: 0, z: 0}
   originalParent: {fileID: 0}
   theGrabedObj: {fileID: 0}
+  sfx: {fileID: 8300000, guid: 60fc61fb103950b48aee628dc1a42ee7, type: 3}
   toolActionName: 
 --- !u!1001 &1678993877
 PrefabInstance:
@@ -369200,6 +369206,7 @@ MonoBehaviour:
   originalPosition: {x: 0, y: 0, z: 0}
   originalParent: {fileID: 0}
   theGrabedObj: {fileID: 0}
+  sfx: {fileID: 8300000, guid: 60fc61fb103950b48aee628dc1a42ee7, type: 3}
   toolActionName: 
 --- !u!1001 &2003348934
 PrefabInstance:

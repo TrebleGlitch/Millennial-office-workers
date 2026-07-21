@@ -346,6 +346,8 @@ public class HandController : MonoBehaviour
 
         Vector3 targetPos = itemToGrab.transform.position;
 
+        itemToGrab.PlayGrabSound();
+
         // 把手移动到目标点
         while (Vector3.Distance(hand.position, targetPos) > 0.1f)
         {
