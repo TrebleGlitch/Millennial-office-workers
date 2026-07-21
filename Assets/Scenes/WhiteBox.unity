@@ -6233,6 +6233,8 @@ MonoBehaviour:
   minInterval: 2
   maxInterval: 8
   totalScore: 0
+  taskUIController: {fileID: 0}
+  startTask: 0
 --- !u!4 &402922896
 Transform:
   m_ObjectHideFlags: 0

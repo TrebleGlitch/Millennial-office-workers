@@ -1291,7 +1291,7 @@ AnimationClip:
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
-  - time: 5.0333333
+  - time: 5
     functionName: PlayPopDingSFX
     data: 
     objectReferenceParameter: {fileID: 0}
@@ -1305,7 +1305,49 @@ AnimationClip:
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
-  - time: 9.366667
+  - time: 9.333333
+    functionName: PlayPopDingSFX
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 12.333333
+    functionName: PlayPopDingSFX
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 14.333333
+    functionName: PlayPopDingSFX
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 17
+    functionName: PlayPopDingSFX
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 19.333334
+    functionName: PlayPopDingSFX
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 20.666666
+    functionName: PlayPopDingSFX
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 23.333334
     functionName: PlayPopDingSFX
     data: 
     objectReferenceParameter: {fileID: 0}
