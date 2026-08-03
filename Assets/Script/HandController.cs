@@ -390,7 +390,7 @@ public class HandController : MonoBehaviour
     IEnumerator ReturnRoutine(Transform hand, InteractableItem itemToReturn, Vector3 basePos)
     {
         Vector3 targetPos = itemToReturn.originalPosition;
-
+        itemToReturn.PlayReturnSound();
         //手部伸向原位
         while (Vector3.Distance(hand.position, targetPos) > 0.1f)
         {

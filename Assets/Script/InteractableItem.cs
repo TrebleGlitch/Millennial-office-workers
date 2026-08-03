@@ -10,7 +10,8 @@ public class InteractableItem : MonoBehaviour
 
     public GameObject theGrabedObj;
 
-    public AudioClip sfx;
+    public AudioClip Grabsfx;
+    public AudioClip Returnsfx;
     private AudioSource sfxSource;
     void Start()
     {
@@ -34,7 +35,12 @@ public class InteractableItem : MonoBehaviour
 
     public void PlayGrabSound()
     {
-        if(sfx != null && sfxSource != null)
-            sfxSource.PlayOneShot(sfx);
+        if(Grabsfx != null && sfxSource != null)
+            sfxSource.PlayOneShot(Grabsfx);
+    }
+    public void PlayReturnSound()
+    {
+        if (Returnsfx != null && sfxSource != null)
+            sfxSource.PlayOneShot(Returnsfx);
     }
 }
