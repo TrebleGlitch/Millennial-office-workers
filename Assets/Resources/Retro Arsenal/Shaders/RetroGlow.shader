@@ -1,129 +1,135 @@
 // Made with Amplify Shader Editor v1.9.8.1
 // Available at the Unity Asset Store - http://u3d.as/y3X 
-Shader "Archanor VFX/Retro Arsenal/BasicGlow"
+Shader "Custom/RetroArsenal/BasicGlowURP"
 {
-	Properties
-	{
-		_Tint("Tint", Color) = (0,0,0,0)
-		_ExtraGlow("Extra Glow", Range( 0 , 15)) = 0
-		_TextureSample("Texture Sample", 2D) = "white" {}
-		[HideInInspector] _texcoord( "", 2D ) = "white" {}
-		[HideInInspector] __dirty( "", Int ) = 1
-	}
+    Properties
+    {
+        _Tint("Tint", Color) = (1,1,1,1)
+        _ExtraGlow("Extra Glow", Range( 0 , 15)) = 0
+        _TextureSample("Texture Sample", 2D) = "white" {}
+    }
 
-	SubShader
-	{
-		Tags{ "RenderType" = "Transparent"  "Queue" = "Transparent+0" "IgnoreProjector" = "True" "IsEmissive" = "true"  }
-		Cull Off
-		CGINCLUDE
-		#include "UnityPBSLighting.cginc"
-		#include "Lighting.cginc"
-		#pragma target 3.0
-		#define ASE_VERSION 19801
-		struct Input
-		{
-			float4 vertexColor : COLOR;
-			float2 uv_texcoord;
-		};
+    SubShader
+    {
+        Tags
+        {
+            "RenderType"="Transparent"
+            "Queue"="Transparent"
+            "RenderPipeline"="UniversalPipeline"
+        }
+        Cull Off
+        ZWrite Off
+        Blend SrcAlpha OneMinusSrcAlpha
 
-		uniform float _ExtraGlow;
-		uniform float4 _Tint;
-		uniform sampler2D _TextureSample;
-		uniform float4 _TextureSample_ST;
+        Pass
+        {
+            Name "ForwardLit"
+            HLSLPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
 
-		inline half4 LightingUnlit( SurfaceOutput s, half3 lightDir, half atten )
-		{
-			return half4 ( 0, 0, 0, s.Alpha );
-		}
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
-		void surf( Input i , inout SurfaceOutput o )
-		{
-			float2 uv_TextureSample = i.uv_texcoord * _TextureSample_ST.xy + _TextureSample_ST.zw;
-			float4 tex2DNode9 = tex2D( _TextureSample, uv_TextureSample );
-			o.Emission = ( ( ( i.vertexColor * _ExtraGlow ) * _Tint ) * tex2DNode9 ).rgb;
-			o.Alpha = ( i.vertexColor.a * tex2DNode9.a );
-		}
+            struct Attributes
+            {
+                float4 positionOS   : POSITION;
+                float2 uv           : TEXCOORD0;
+                float4 color        : COLOR;
+            };
 
-		ENDCG
-		CGPROGRAM
-		#pragma surface surf Unlit alpha:fade keepalpha fullforwardshadows 
+            struct Varyings
+            {
+                float4 positionHCS  : SV_POSITION;
+                float2 uv           : TEXCOORD0;
+                float4 vertexColor  : COLOR;
+            };
 
-		ENDCG
-		Pass
-		{
-			Name "ShadowCaster"
-			Tags{ "LightMode" = "ShadowCaster" }
-			ZWrite On
-			CGPROGRAM
-			#pragma vertex vert
-			#pragma fragment frag
-			#pragma target 3.0
-			#pragma multi_compile_shadowcaster
-			#pragma multi_compile UNITY_PASS_SHADOWCASTER
-			#pragma skip_variants FOG_LINEAR FOG_EXP FOG_EXP2
-			#include "HLSLSupport.cginc"
-			#if ( SHADER_API_D3D11 || SHADER_API_GLCORE || SHADER_API_GLES || SHADER_API_GLES3 || SHADER_API_METAL || SHADER_API_VULKAN )
-				#define CAN_SKIP_VPOS
-			#endif
-			#include "UnityCG.cginc"
-			#include "Lighting.cginc"
-			#include "UnityPBSLighting.cginc"
-			sampler3D _DitherMaskLOD;
-			struct v2f
-			{
-				V2F_SHADOW_CASTER;
-				float2 customPack1 : TEXCOORD1;
-				float3 worldPos : TEXCOORD2;
-				half4 color : COLOR0;
-				UNITY_VERTEX_INPUT_INSTANCE_ID
-				UNITY_VERTEX_OUTPUT_STEREO
-			};
-			v2f vert( appdata_full v )
-			{
-				v2f o;
-				UNITY_SETUP_INSTANCE_ID( v );
-				UNITY_INITIALIZE_OUTPUT( v2f, o );
-				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO( o );
-				UNITY_TRANSFER_INSTANCE_ID( v, o );
-				Input customInputData;
-				float3 worldPos = mul( unity_ObjectToWorld, v.vertex ).xyz;
-				half3 worldNormal = UnityObjectToWorldNormal( v.normal );
-				o.customPack1.xy = customInputData.uv_texcoord;
-				o.customPack1.xy = v.texcoord;
-				o.worldPos = worldPos;
-				TRANSFER_SHADOW_CASTER_NORMALOFFSET( o )
-				o.color = v.color;
-				return o;
-			}
-			half4 frag( v2f IN
-			#if !defined( CAN_SKIP_VPOS )
-			, UNITY_VPOS_TYPE vpos : VPOS
-			#endif
-			) : SV_Target
-			{
-				UNITY_SETUP_INSTANCE_ID( IN );
-				Input surfIN;
-				UNITY_INITIALIZE_OUTPUT( Input, surfIN );
-				surfIN.uv_texcoord = IN.customPack1.xy;
-				float3 worldPos = IN.worldPos;
-				half3 worldViewDir = normalize( UnityWorldSpaceViewDir( worldPos ) );
-				surfIN.vertexColor = IN.color;
-				SurfaceOutput o;
-				UNITY_INITIALIZE_OUTPUT( SurfaceOutput, o )
-				surf( surfIN, o );
-				#if defined( CAN_SKIP_VPOS )
-				float2 vpos = IN.pos;
-				#endif
-				half alphaRef = tex3D( _DitherMaskLOD, float3( vpos.xy * 0.25, o.Alpha * 0.9375 ) ).a;
-				clip( alphaRef - 0.01 );
-				SHADOW_CASTER_FRAGMENT( IN )
-			}
-			ENDCG
-		}
-	}
-	Fallback "Diffuse"
-	CustomEditor "AmplifyShaderEditor.MaterialInspector"
+            CBUFFER_START(UnityPerMaterial)
+                float4 _Tint;
+                float _ExtraGlow;
+                SAMPLER(sampler_TextureSample);
+                float4 _TextureSample_ST;
+            CBUFFER_END
+            TEXTURE2D(_TextureSample);
+
+            Varyings vert(Attributes input)
+            {
+                Varyings output;
+                output.positionHCS = TransformObjectToHClip(input.positionOS.xyz);
+                output.uv = TRANSFORM_TEX(input.uv, _TextureSample);
+                output.vertexColor = input.color;
+                return output;
+            }
+
+            half4 frag(Varyings i) : SV_Target
+            {
+                half4 tex = SAMPLE_TEXTURE2D(_TextureSample, sampler_TextureSample, i.uv);
+                half3 col = tex.rgb * i.vertexColor.rgb * _Tint.rgb * _ExtraGlow;
+                half alpha = tex.a * i.vertexColor.a;
+
+                half4 final;
+                final.rgb = col;
+                final.a = alpha;
+                return final;
+            }
+            ENDHLSL
+        }
+
+        // URP “ı”∞Õ∂…‰Pass
+        Pass
+        {
+            Name "ShadowCaster"
+            Tags { "LightMode" = "ShadowCaster" }
+            ZWrite On
+            ZTest LEqual
+
+            HLSLPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl"
+
+            struct Attributes
+            {
+                float4 positionOS   : POSITION;
+                float2 uv : TEXCOORD0;
+                float4 color : COLOR;
+            };
+            struct Varyings
+            {
+                float4 positionHCS  : SV_POSITION;
+                float alpha : TEXCOORD0;
+            };
+
+            CBUFFER_START(UnityPerMaterial)
+                SAMPLER(sampler_TextureSample);
+                float4 _TextureSample_ST;
+            CBUFFER_END
+            TEXTURE2D(_TextureSample);
+
+            Varyings vert(Attributes input)
+            {
+                Varyings output;
+                float3 posWS = TransformObjectToWorld(input.positionOS.xyz);
+                output.positionHCS = TransformWorldToHClip(ApplyShadowBias(posWS, normalize(mul((float3x3)unity_ObjectToWorld, float3(0,1,0))), _LightDirection));
+                float2 uv = TRANSFORM_TEX(input.uv, _TextureSample);
+                half4 tex = SAMPLE_TEXTURE2D(_TextureSample, sampler_TextureSample, uv);
+                output.alpha = tex.a * input.color.a;
+                return output;
+            }
+
+            half4 frag(Varyings i) : SV_Target
+            {
+                clip(i.alpha - 0.01);
+                return 0;
+            }
+            ENDHLSL
+        }
+    }
+    FallBack "Hidden/Universal Render Pipeline/FallbackError"
+    CustomEditor ""
 }
+
 /*ASEBEGIN
 Version=19801
 Node;AmplifyShaderEditor.VertexColorNode;3;-900.6292,-292.9637;Inherit;False;0;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
